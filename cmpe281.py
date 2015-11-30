@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
+from flask.ext.cors import CORS
+
 from lib.database_handler import DatabaseHandler
 
 app = Flask(__name__)
- 
+CORS(app, resources=r'/*', allow_headers='Content-Type')
 @app.route("/")
 def hello():
     return "Welcome to Python Flask App!"
@@ -90,6 +92,7 @@ def get_bugs():
     result.update({"results":bugs})
     return jsonify(result)
 
+
 @app.route('/bugs', methods=['GET'])
 def get_all_bugs():
     raw_bugs_data = DatabaseHandler.get_all_bugs()
@@ -100,6 +103,21 @@ def get_all_bugs():
     result = dict()
     result.update({"results":bugs})
     return jsonify(result)
+
+#respond to ajax login request added by Martin 2015-11-29 20:25:28
+@app.route('/ajax/login', methods=['POST'])
+def user_login():
+    user_records = DatabaseHandler.user_login(request.data)
+    print user_records
+    user = []
+    if user_records:
+        # for userId, username, email, firstName, lastName, password, roleName, credit, money, cardType in user_records:
+        for userId, username, email, firstName, lastName, password, roleName, credit, money, cardType, cardNumber, cardHolder, validDate, csc, billingAddress, city, state, zipcode in user_records:
+            user.append({"userId": userId, "username": username, "firstName": firstName, "lastName":lastName, "roleName":roleName, "credit":credit, "money":money, "cardType":cardType, "cardNumber":cardNumber, "cardHolder":cardHolder, "validDate":validDate, "csc":csc, "billingAddress":billingAddress, "city":city, "state":state, "zipcode":zipcode})
+    result = dict()
+    result.update({"results": user})
+    return jsonify(result)
+
 
 
 if __name__ == "__main__":

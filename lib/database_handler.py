@@ -272,6 +272,7 @@ class DatabaseHandler(object):
                 query = "SELECT * FROM Bugs"
                 cursor.execute(query)
                 rows = cursor.fetchall()
+                print rows
                 return rows
             except mysql.DatabaseError, e:
                 if db:
@@ -304,6 +305,33 @@ class DatabaseHandler(object):
                 else:
                     return None
                 rows = cursor.fetchall()
+                return rows
+            except mysql.DatabaseError, e:
+                if db:
+                    db.rollback()
+                    raise e
+    #login method added by Martin 2015-11-29 19:54:52
+    @staticmethod
+    def user_login(user):
+        print "getting in"
+        print user
+        parsed_data = json.loads(user)
+
+        #rolename = parsed_data["roleName"]
+        username = parsed_data["username"]
+        password = parsed_data["password"]
+        #print rolename
+        print username
+        print password
+        with DatabaseDriver() as db:
+            cursor = db.cursor()
+            try:
+                query = "SELECT * FROM Users WHERE (username,password) = (%s,%s)"
+                #query = "SELECT * FROM Users WHERE (username,password) = (" + username +","+
+                data = (username, password)
+                cursor.execute(query, data)
+                rows = cursor.fetchall()
+                print rows
                 return rows
             except mysql.DatabaseError, e:
                 if db:
