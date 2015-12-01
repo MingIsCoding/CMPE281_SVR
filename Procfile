@@ -1,1 +1,1 @@
-web: gunicorn hello:app --log-file=-
+web: gunicorn cmpe281:app --log-file=-
